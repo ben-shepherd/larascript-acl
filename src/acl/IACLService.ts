@@ -32,6 +32,7 @@ export interface IBasicACLService {
   getRole(role: string): IAclRole;
   hasScope(entity: IAccessControlEntity, scope: string): boolean;
   hasScopes(entity: IAccessControlEntity, scopes: string[]): boolean;
+  hasRole(entity: IAccessControlEntity, role: string | string[]): boolean;
   hasGroup(entity: IAccessControlEntity, groups: string | string[]): boolean;
   assignRoleToUser(
     entity: IAccessControlEntity,

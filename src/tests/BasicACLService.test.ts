@@ -437,6 +437,96 @@ describe("BasicACLService", () => {
     });
   });
 
+  describe("hasRole", () => {
+    test("should return true when user has the role", async () => {
+      await aclService.assignRoleToUser(mockEntity, "role_admin");
+      const hasRole = aclService.hasRole(mockEntity, "role_admin");
+      expect(hasRole).toBe(true);
+    });
+
+    test("should return false when user does not have the role", async () => {
+      await aclService.assignRoleToUser(mockEntity, "role_user");
+      const hasRole = aclService.hasRole(mockEntity, "role_admin");
+      expect(hasRole).toBe(false);
+    });
+
+    test("should return false when user has no roles", () => {
+      const hasRole = aclService.hasRole(mockEntity, "role_admin");
+      expect(hasRole).toBe(false);
+    });
+
+    test("should return true when user has all specified roles", async () => {
+      await aclService.assignRoleToUser(mockEntity, [
+        "role_admin",
+        "role_user",
+      ]);
+      const hasRole = aclService.hasRole(mockEntity, [
+        "role_admin",
+        "role_user",
+      ]);
+      expect(hasRole).toBe(true);
+    });
+
+    test("should return false when user is missing any of the specified roles", async () => {
+      await aclService.assignRoleToUser(mockEntity, ["role_admin"]);
+      const hasRole = aclService.hasRole(mockEntity, [
+        "role_admin",
+        "role_user",
+      ]);
+      expect(hasRole).toBe(false);
+    });
+
+    test("should return true for empty roles array", () => {
+      const hasRole = aclService.hasRole(mockEntity, []);
+      expect(hasRole).toBe(true);
+    });
+
+    test("should handle single string role parameter", async () => {
+      await aclService.assignRoleToUser(mockEntity, "role_admin");
+      const hasRole = aclService.hasRole(mockEntity, "role_admin");
+      expect(hasRole).toBe(true);
+    });
+
+    test("should handle array of roles parameter", async () => {
+      await aclService.assignRoleToUser(mockEntity, [
+        "role_admin",
+        "role_user",
+      ]);
+      const hasRole = aclService.hasRole(mockEntity, [
+        "role_admin",
+        "role_user",
+      ]);
+      expect(hasRole).toBe(true);
+    });
+
+    test("should return false for non-existent role check", async () => {
+      await aclService.assignRoleToUser(mockEntity, "role_admin");
+      const hasRole = aclService.hasRole(mockEntity, "non-existent-role");
+      expect(hasRole).toBe(false);
+    });
+
+    test("should return false when checking multiple roles and user has none", () => {
+      const hasRole = aclService.hasRole(mockEntity, [
+        "role_admin",
+        "role_user",
+      ]);
+      expect(hasRole).toBe(false);
+    });
+
+    test("should return true when user has more roles than required", async () => {
+      await aclService.assignRoleToUser(mockEntity, [
+        "role_admin",
+        "role_user",
+        "role_moderator",
+      ]);
+      const hasRole = aclService.hasRole(mockEntity, [
+        "role_admin",
+        "role_user",
+      ]);
+      expect(hasRole).toBe(true);
+    });
+  });
+
   describe("hasGroup", () => {
     test("should return true when user has the group", async () => {
       await aclService.assignGroupToUser(mockEntity, "admin");

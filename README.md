@@ -73,6 +73,10 @@ const hasReadPermission = aclService.hasScope(user, 'read:own');
 const hasAllPermissions = aclService.hasScopes(user, ['read:own', 'write:own']);
 // Returns: true
 
+// Check user roles
+const hasAdminRole = aclService.hasRole(user, 'role_admin');
+// Returns: false
+
 // Get user permissions
 const scopes = aclService.getRoleScopesFromUser(user);
 // Returns: ['read:own', 'write:own']
@@ -85,6 +89,7 @@ const scopes = aclService.getRoleScopesFromUser(user);
 #### Permission Checking
 - `hasScope(entity, scope)` - Check if user has a specific scope
 - `hasScopes(entity, scopes)` - Check if user has all specified scopes
+- `hasRole(entity, role)` - Check if user has specified role(s)
 - `hasGroup(entity, groups)` - Check if user belongs to specified group(s)
 
 #### Role Management
@@ -172,6 +177,20 @@ if (aclService.hasScope(user, 'read:all')) {
 // Check multiple permissions (ALL must be present)
 if (aclService.hasScopes(user, ['read:all', 'write:limited'])) {
   // User has both permissions
+}
+```
+
+### Role-based Access Control
+
+```typescript
+// Check if user has a specific role
+if (aclService.hasRole(user, 'role_admin')) {
+  // User is an admin
+}
+
+// Check if user has multiple roles (ALL must be present)
+if (aclService.hasRole(user, ['role_admin', 'role_moderator'])) {
+  // User has both admin and moderator roles
 }
 ```
 

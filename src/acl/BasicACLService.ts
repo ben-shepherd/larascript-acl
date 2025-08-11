@@ -190,6 +190,24 @@ export class BasicACLService implements IBasicACLService {
   /**
    * Checks if the user has the given role
    *
+   * @param entity The access control entity to check
+   * @param role The role(s) to check
+   * @returns True if the user has the role(s), false otherwise
+   */
+  hasRole(entity: IAccessControlEntity, role: string | string[]): boolean {
+    const rolesArray = typeof role === "string" ? [role] : role;
+    const userRoles = entity.getAclRoles() ?? [];
+
+    for (const requiredRole of rolesArray) {
+      if (!userRoles.includes(requiredRole)) return false;
+    }
+
+    return true;
+  }
+
+  /**
+   * Checks if the user has the given group
+   *
    * @param role The role to check
    * @returns True if the user has the role, false otherwise
    */
