@@ -1,10 +1,10 @@
 {
-  "name": "PLACEHOLDER",
+  "name": "@ben-shepherd/larascript-acl-bundle",
   "version": "1.0.0",
-  "description": "PLACEHOLDER DESCRIPTION",
+  "description": "ACL bundle for Larascript Framework",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ben-shepherd/PLACEHOLDER_REPOSITORY"
+    "url": "git+https://github.com/ben-shepherd/larascript-acl-bundle"
   },
   "license": "ISC",
   "author": "ben.shepherd@gmx.com",
