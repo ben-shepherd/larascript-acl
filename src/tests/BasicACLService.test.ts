@@ -398,13 +398,19 @@ describe("BasicACLService", () => {
   describe("hasScopes", () => {
     test("should return true when user has all scopes", async () => {
       await aclService.assignRoleToUser(mockEntity, "role_admin");
-      const hasScopes = aclService.hasScopes(mockEntity, ["read:all", "write:all"]);
+      const hasScopes = aclService.hasScopes(mockEntity, [
+        "read:all",
+        "write:all",
+      ]);
       expect(hasScopes).toBe(true);
     });
 
     test("should return false when user is missing any scope", async () => {
       await aclService.assignRoleToUser(mockEntity, "role_user");
-      const hasScopes = aclService.hasScopes(mockEntity, ["read:own", "delete:all"]);
+      const hasScopes = aclService.hasScopes(mockEntity, [
+        "read:own",
+        "delete:all",
+      ]);
       expect(hasScopes).toBe(false);
     });
 
@@ -419,8 +425,14 @@ describe("BasicACLService", () => {
     });
 
     test("should return true when user has multiple roles covering all scopes", async () => {
-      await aclService.assignRoleToUser(mockEntity, ["role_admin", "role_user"]);
-      const hasScopes = aclService.hasScopes(mockEntity, ["read:all", "write:own"]);
+      await aclService.assignRoleToUser(mockEntity, [
+        "role_admin",
+        "role_user",
+      ]);
+      const hasScopes = aclService.hasScopes(mockEntity, [
+        "read:all",
+        "write:own",
+      ]);
       expect(hasScopes).toBe(true);
     });
   });

@@ -40,7 +40,7 @@ export class BasicACLService implements IBasicACLService {
    * @returns True if the user has the scope, false otherwise
    */
   hasScope(entity: IAccessControlEntity, scope: string): boolean {
-    const roles = entity.getAclRoles() ?? []
+    const roles = entity.getAclRoles() ?? [];
 
     for (const roleName of roles) {
       const role = this.getRole(roleName);
@@ -52,7 +52,7 @@ export class BasicACLService implements IBasicACLService {
 
   /**
    * Checks if the user has any of the given scopes
-   * 
+   *
    * @param scopes The scopes to check
    * @returns True if the user has any of the scopes, false otherwise
    */
@@ -188,14 +188,14 @@ export class BasicACLService implements IBasicACLService {
   }
 
   /**
- * Checks if the user has the given role
- *
- * @param role The role to check
- * @returns True if the user has the role, false otherwise
- */
+   * Checks if the user has the given role
+   *
+   * @param role The role to check
+   * @returns True if the user has the role, false otherwise
+   */
   hasGroup(entity: IAccessControlEntity, groups: string | string[]): boolean {
-    groups = typeof groups === 'string' ? [groups] : groups;
-    const foundGroups = entity.getAclGroups() ?? [] as string[];
+    groups = typeof groups === "string" ? [groups] : groups;
+    const foundGroups = entity.getAclGroups() ?? ([] as string[]);
 
     for (const group of groups) {
       if (!foundGroups.includes(group)) return false;
