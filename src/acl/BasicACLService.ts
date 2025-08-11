@@ -21,9 +21,7 @@ import {
  * - Scopes/permissions for each role
  */
 export class BasicACLService implements IBasicACLService {
-  private aclConfig: IAclConfig;
-
-  constructor(aclConfig: IAclConfig) {
+  constructor(private readonly aclConfig: IAclConfig) {
     this.aclConfig = aclConfig;
   }
 
