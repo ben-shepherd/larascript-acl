@@ -2,12 +2,33 @@
 
 A lightweight Access Control List (ACL) service for the Larascript Framework that provides role-based access control (RBAC) functionality.
 
+## Table of Contents
+
+- [Features](#features)
+- [Installation](#installation)
+- [Quick Start](#quick-start)
+  - [Service-based Approach](#service-based-approach)
+  - [Composable ACL Approach](#composable-acl-approach)
+- [API Reference](#api-reference)
+  - [Core Service Methods](#core-service-methods)
+  - [Interfaces](#interfaces)
+  - [Error Handling](#error-handling)
+- [Usage Examples](#usage-examples)
+  - [Basic Permission Checking](#basic-permission-checking)
+  - [Role-based Access Control](#role-based-access-control)
+  - [Group-based Access Control](#group-based-access-control)
+  - [Role and Group Management](#role-and-group-management)
+  - [Getting Permissions and Scopes](#getting-permissions-and-scopes)
+- [Development](#development)
+- [License](#license)
+
 ## Features
 
 - **Role Management**: Define roles with specific permissions/scopes
 - **Group Management**: Organize roles into groups for easier administration
 - **User Assignment**: Assign roles and groups to users
 - **Permission Validation**: Check user permissions based on their roles
+- **Composable ACL**: Mixin-based approach for adding ACL functionality to any class
 - **TypeScript Support**: Full type safety with TypeScript interfaces
 - **Custom Exceptions**: Dedicated `BasicACLException` for error handling
 
@@ -18,6 +39,8 @@ npm install ben-shepherd/larascript-acl-bundle
 ```
 
 ## Quick Start
+
+### Service-based Approach
 
 ```typescript
 import { BasicACLService, IAclConfig, BasicACLException } from '@ben-shepherd/larascript-acl-bundle';
@@ -81,6 +104,62 @@ const hasAdminRole = aclService.hasRole(user, 'role_admin');
 const scopes = aclService.getRoleScopesFromUser(user);
 // Returns: ['read:own', 'write:own']
 ```
+
+### Composable ACL Approach
+
+For a more object-oriented approach, you can use the Composable ACL mixin to add ACL functionality directly to your classes:
+
+```typescript
+import { compose } from '@ben-shepherd/larascript-acl-bundle/utils';
+import { ComposableACL, IAclConfig } from '@ben-shepherd/larascript-acl-bundle';
+
+// Define your ACL configuration
+const aclConfig: IAclConfig = {
+  defaultGroup: 'user',
+  groups: [
+    {
+      name: 'admin',
+      roles: ['role_admin']
+    },
+    {
+      name: 'user', 
+      roles: ['role_user']
+    }
+  ],
+  roles: [
+    {
+      name: 'role_admin',
+      scopes: ['read:all', 'write:all', 'delete:all']
+    },
+    {
+      name: 'role_user',
+      scopes: ['read:own', 'write:own']
+    }
+  ]
+};
+
+// Base user class
+class BaseUser {
+  constructor(public id: string, public email: string) {}
+}
+
+// User class with ACL functionality
+class User extends compose(BaseUser, ComposableACL(aclConfig)) {
+  constructor(id: string, email: string) {
+    super(id, email);
+  }
+}
+
+// Usage
+const user = new User('1', 'john@example.com');
+await user.assignRoleToUser('role_user');
+
+// Check permissions directly on the user object
+console.log(user.hasScope('read:own')); // true
+console.log(user.hasRole('role_user')); // true
+```
+
+For more details on the Composable ACL approach, see the [Composable ACL Documentation](docs/ComposableACL.md).
 
 ## API Reference
 
