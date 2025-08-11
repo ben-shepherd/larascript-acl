@@ -1,4 +1,5 @@
 import {
+  BasicACLException,
   IAccessControlEntity,
   IAclConfig,
   IAclGroup,
@@ -96,7 +97,7 @@ export class BasicACLService implements IBasicACLService {
     const result = this.aclConfig.roles.find((r) => r.name === role);
 
     if (!result) {
-      throw new Error(`Role ${role} not found`);
+      throw new BasicACLException(`Role ${role} not found`);
     }
 
     return result;
@@ -182,7 +183,7 @@ export class BasicACLService implements IBasicACLService {
     const result = this.aclConfig.groups.find((g) => g.name === group);
 
     if (!result) {
-      throw new Error(`Group ${group} not found`);
+      throw new BasicACLException(`Group ${group} not found`);
     }
 
     return result;

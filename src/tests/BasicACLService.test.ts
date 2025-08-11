@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, test } from "@jest/globals";
 import {
+  BasicACLException,
   BasicACLService,
   IAccessControlEntity,
   IAclConfig,
@@ -101,6 +102,12 @@ describe("BasicACLService", () => {
     test("should throw error for non-existent group", () => {
       expect(() => {
         aclService.getGroup("non-existent");
+      }).toThrow(BasicACLException);
+    });
+
+    test("should throw BasicACLException with correct message for non-existent group", () => {
+      expect(() => {
+        aclService.getGroup("non-existent");
       }).toThrow("Group non-existent not found");
     });
   });
@@ -153,6 +160,12 @@ describe("BasicACLService", () => {
     });
 
     test("should throw error for non-existent role", () => {
+      expect(() => {
+        aclService.getRole("non-existent-role");
+      }).toThrow(BasicACLException);
+    });
+
+    test("should throw BasicACLException with correct message for non-existent role", () => {
       expect(() => {
         aclService.getRole("non-existent-role");
       }).toThrow("Role non-existent-role not found");
@@ -368,6 +381,13 @@ describe("BasicACLService", () => {
     });
 
     test("should throw error when user has non-existent role", async () => {
+      await aclService.assignRoleToUser(mockEntity, "non-existent-role");
+      expect(() => {
+        aclService.hasScope(mockEntity, "read:all");
+      }).toThrow(BasicACLException);
+    });
+
+    test("should throw BasicACLException with correct message when user has non-existent role", async () => {
       await aclService.assignRoleToUser(mockEntity, "non-existent-role");
       expect(() => {
         aclService.hasScope(mockEntity, "read:all");
