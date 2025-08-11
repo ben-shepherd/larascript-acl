@@ -1,17 +1,17 @@
 import { TClassConstructor } from "../utils/compose";
-import { BasicACLException } from "./BasicACLException";
+import { BasicACLService } from "./BasicACLService";
 import {
   IAccessControlEntity,
   IAclConfig,
   IAclGroup,
-  IAclRole,
 } from "./IACLService";
 
 /**
  * Composable ACL Mixin
  *
  * This mixin provides access control functionality that can be composed
- * into other classes using the compose utility.
+ * into other classes using the compose utility. It uses the BasicACLService
+ * internally to handle all ACL logic.
  *
  * Usage:
  * ```typescript
@@ -27,10 +27,12 @@ export const ComposableACL = <T extends TClassConstructor>(
     return class extends BaseClass implements IAccessControlEntity {
       _aclRoles: string[] = [];
       _aclGroups: string[] = [];
+      _aclService: BasicACLService;
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       constructor(...args: any[]) {
         super(...args);
+        this._aclService = new BasicACLService(aclConfig);
       }
 
       // IAccessControlEntity implementation
@@ -50,158 +52,77 @@ export const ComposableACL = <T extends TClassConstructor>(
         this._aclGroups = groups;
       }
 
-      // ACL Service methods
-      getConfig(): IAclConfig {
-        return aclConfig;
+      // ACL Service methods - delegate to BasicACLService
+      getConfig() {
+        return this._aclService.getConfig();
       }
 
-      getDefaultGroup(): IAclGroup {
-        return this.getGroup(aclConfig.defaultGroup);
+      getDefaultGroup() {
+        return this._aclService.getDefaultGroup();
       }
 
-      getGroup(group: string): IAclGroup {
-        const result = aclConfig.groups.find((g) => g.name === group);
-
-        if (!result) {
-          throw new BasicACLException(`Group ${group} not found`);
-        }
-
-        return result;
+      getGroup(group: string) {
+        return this._aclService.getGroup(group);
       }
 
-      getRole(role: string): IAclRole {
-        const result = aclConfig.roles.find((r) => r.name === role);
-
-        if (!result) {
-          throw new BasicACLException(`Role ${role} not found`);
-        }
-
-        return result;
+      getRole(role: string) {
+        return this._aclService.getRole(role);
       }
 
       hasScope(scope: string): boolean {
-        const roles = this.getAclRoles() ?? [];
-
-        for (const roleName of roles) {
-          const role = this.getRole(roleName);
-          if (role.scopes.includes(scope)) return true;
-        }
-
-        return false;
+        return this._aclService.hasScope(this, scope);
       }
 
       hasScopes(scopes: string[]): boolean {
-        for (const scope of scopes) {
-          if (!this.hasScope(scope)) return false;
-        }
-
-        return true;
+        return this._aclService.hasScopes(this, scopes);
       }
 
       hasRole(role: string | string[]): boolean {
-        const rolesArray = typeof role === "string" ? [role] : role;
-        const userRoles = this.getAclRoles() ?? [];
-
-        for (const requiredRole of rolesArray) {
-          if (!userRoles.includes(requiredRole)) return false;
-        }
-
-        return true;
+        return this._aclService.hasRole(this, role);
       }
 
       hasGroup(groups: string | string[]): boolean {
-        groups = typeof groups === "string" ? [groups] : groups;
-        const foundGroups = this.getAclGroups() ?? [];
-
-        for (const group of groups) {
-          if (!foundGroups.includes(group)) return false;
-        }
-
-        return true;
+        return this._aclService.hasGroup(this, groups);
       }
 
       getRoleScopesFromUser(): string[] {
-        const roles = this.getAclRoles();
-
-        if (!roles) {
-          return [];
-        }
-
-        let scopes: string[] = [];
-
-        for (const roleString of roles) {
-          const role = this.getRole(roleString);
-          scopes = [...scopes, ...role.scopes];
-        }
-
-        return scopes;
+        return this._aclService.getRoleScopesFromUser(this);
       }
 
       getRoleScopes(role: string | string[]): string[] {
-        const rolesArray = typeof role === "string" ? [role] : role;
-        let scopes: string[] = [];
-
-        for (const roleStr of rolesArray) {
-          const role = this.getRole(roleStr);
-          scopes = [...scopes, ...role.scopes];
-        }
-
-        return scopes;
+        return this._aclService.getRoleScopes(role);
       }
 
-      getGroupRoles(group: string | IAclGroup): IAclRole[] {
-        const groupResult =
-          typeof group === "string" ? this.getGroup(group) : group;
-        return groupResult.roles.map((role) => this.getRole(role));
+      getGroupRoles(group: string | IAclGroup) {
+        return this._aclService.getGroupRoles(group);
       }
 
       getGroupScopes(group: string | IAclGroup): string[] {
-        const roles = this.getGroupRoles(group);
-        return roles.map((role) => role.scopes).flat();
+        return this._aclService.getGroupScopes(group);
       }
 
       async assignRoleToUser(role: string | string[]): Promise<void> {
-        const rolesArray = typeof role === "string" ? [role] : role;
-        this.setAclRoles(rolesArray);
+        return this._aclService.assignRoleToUser(this, role);
       }
 
       async appendRoleToUser(role: string): Promise<void> {
-        const currentRoles = this.getAclRoles() ?? [];
-        const newRoles = [...currentRoles, role];
-
-        this.setAclRoles(newRoles);
+        return this._aclService.appendRoleToUser(this, role);
       }
 
       async removeRoleFromUser(role: string | string[]): Promise<void> {
-        const rolesArray = typeof role === "string" ? [role] : role;
-        const currentRoles = this.getAclRoles() ?? [];
-        const newRoles = currentRoles.filter(
-          (r) => false === rolesArray.includes(r),
-        );
-
-        this.setAclRoles(newRoles);
+        return this._aclService.removeRoleFromUser(this, role);
       }
 
       async assignGroupToUser(group: string | string[]): Promise<void> {
-        const groupsArray = typeof group === "string" ? [group] : group;
-        this.setAclGroups(groupsArray);
+        return this._aclService.assignGroupToUser(this, group);
       }
 
       async appendGroupToUser(group: string): Promise<void> {
-        const currentGroups = this.getAclGroups() ?? [];
-        const newGroups = [...currentGroups, group];
-
-        this.setAclGroups(newGroups);
+        return this._aclService.appendGroupToUser(this, group);
       }
 
       async removeGroupFromUser(group: string | string[]): Promise<void> {
-        const groupsArray = typeof group === "string" ? [group] : group;
-        const currentGroups = this.getAclGroups() ?? [];
-        const newGroups = currentGroups.filter(
-          (g) => false === groupsArray.includes(g),
-        );
-
-        this.setAclGroups(newGroups);
+        return this._aclService.removeGroupFromUser(this, group);
       }
     };
   };
