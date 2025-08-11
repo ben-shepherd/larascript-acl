@@ -35,12 +35,43 @@ export class BasicACLService implements IBasicACLService {
   }
 
   /**
+   * Checks if the user has the given scope
+   *
+   * @param scope The scope to check
+   * @returns True if the user has the scope, false otherwise
+   */
+  hasScope(entity: IAccessControlEntity, scope: string): boolean {
+    const roles = entity.getAclRoles() ?? []
+
+    for (const roleName of roles) {
+      const role = this.getRole(roleName);
+      if (role.scopes.includes(scope)) return true;
+    }
+
+    return false;
+  }
+
+  /**
+   * Checks if the user has any of the given scopes
+   * 
+   * @param scopes The scopes to check
+   * @returns True if the user has any of the scopes, false otherwise
+   */
+  hasScopes(entity: IAccessControlEntity, scopes: string[]): boolean {
+    for (const scope of scopes) {
+      if (!this.hasScope(entity, scope)) return false;
+    }
+
+    return true;
+  }
+
+  /**
    * Retrieves the scopes from the roles
    * @param data
    * @returns
    */
-  getRoleScopesFromUser(data: IAccessControlEntity): string[] {
-    const roles = data.getAclRoles();
+  getRoleScopesFromUser(entity: IAccessControlEntity): string[] {
+    const roles = entity.getAclRoles();
 
     if (!roles) {
       return [];
@@ -94,11 +125,11 @@ export class BasicACLService implements IBasicACLService {
    * @param role
    */
   async assignRoleToUser(
-    data: IAccessControlEntity,
+    entity: IAccessControlEntity,
     role: string | string[],
   ): Promise<void> {
     const rolesArray = typeof role === "string" ? [role] : role;
-    data.setAclRoles(rolesArray);
+    entity.setAclRoles(rolesArray);
   }
 
   /**
@@ -107,13 +138,13 @@ export class BasicACLService implements IBasicACLService {
    * @param role
    */
   async appendRoleToUser(
-    data: IAccessControlEntity,
+    entity: IAccessControlEntity,
     role: string,
   ): Promise<void> {
-    const currentRoles = data.getAclRoles() ?? [];
+    const currentRoles = entity.getAclRoles() ?? [];
     const newRoles = [...currentRoles, role];
 
-    data.setAclRoles(newRoles);
+    entity.setAclRoles(newRoles);
   }
 
   /**
@@ -122,16 +153,16 @@ export class BasicACLService implements IBasicACLService {
    * @param role
    */
   async removeRoleFromUser(
-    data: IAccessControlEntity,
+    entity: IAccessControlEntity,
     role: string | string[],
   ): Promise<void> {
     const rolesArray = typeof role === "string" ? [role] : role;
-    const currentRoles = data.getAclRoles() ?? [];
+    const currentRoles = entity.getAclRoles() ?? [];
     const newRoles = currentRoles.filter(
       (r) => false === rolesArray.includes(r),
     );
 
-    data.setAclRoles(newRoles);
+    entity.setAclRoles(newRoles);
   }
 
   /**
@@ -155,6 +186,23 @@ export class BasicACLService implements IBasicACLService {
     }
 
     return result;
+  }
+
+  /**
+ * Checks if the user has the given role
+ *
+ * @param role The role to check
+ * @returns True if the user has the role, false otherwise
+ */
+  hasGroup(entity: IAccessControlEntity, groups: string | string[]): boolean {
+    groups = typeof groups === 'string' ? [groups] : groups;
+    const foundGroups = entity.getAclGroups() ?? [] as string[];
+
+    for (const group of groups) {
+      if (!foundGroups.includes(group)) return false;
+    }
+
+    return true;
   }
 
   /**
@@ -184,12 +232,12 @@ export class BasicACLService implements IBasicACLService {
    * @param group
    */
   async assignGroupToUser(
-    data: IAccessControlEntity,
+    entity: IAccessControlEntity,
     group: string | string[],
   ): Promise<void> {
     const groupsArray = typeof group === "string" ? [group] : group;
 
-    data.setAclGroups(groupsArray);
+    entity.setAclGroups(groupsArray);
   }
 
   /**
@@ -198,13 +246,13 @@ export class BasicACLService implements IBasicACLService {
    * @param group
    */
   async appendGroupToUser(
-    data: IAccessControlEntity,
+    entity: IAccessControlEntity,
     group: string,
   ): Promise<void> {
-    const currentGroups = data.getAclGroups() ?? [];
+    const currentGroups = entity.getAclGroups() ?? [];
     const newGroups = [...currentGroups, group];
 
-    data.setAclGroups(newGroups);
+    entity.setAclGroups(newGroups);
   }
 
   /**
@@ -213,16 +261,16 @@ export class BasicACLService implements IBasicACLService {
    * @param group
    */
   async removeGroupFromUser(
-    data: IAccessControlEntity,
+    entity: IAccessControlEntity,
     group: string | string[],
   ): Promise<void> {
     const groupsArray = typeof group === "string" ? [group] : group;
-    const currentGroups = data.getAclGroups() ?? [];
+    const currentGroups = entity.getAclGroups() ?? [];
     const newGroups = currentGroups.filter(
       (g) => false === groupsArray.includes(g),
     );
 
-    data.setAclGroups(newGroups);
+    entity.setAclGroups(newGroups);
   }
 }
 

@@ -331,6 +331,128 @@ describe("BasicACLService", () => {
     });
   });
 
+  describe("hasScope", () => {
+    test("should return true when user has the scope", async () => {
+      await aclService.assignRoleToUser(mockEntity, "role_admin");
+      const hasScope = aclService.hasScope(mockEntity, "read:all");
+      expect(hasScope).toBe(true);
+    });
+
+    test("should return false when user does not have the scope", async () => {
+      await aclService.assignRoleToUser(mockEntity, "role_user");
+      const hasScope = aclService.hasScope(mockEntity, "delete:all");
+      expect(hasScope).toBe(false);
+    });
+
+    test("should return false when user has no roles", () => {
+      const hasScope = aclService.hasScope(mockEntity, "read:all");
+      expect(hasScope).toBe(false);
+    });
+
+    test("should return true for exact scope match", async () => {
+      await aclService.assignRoleToUser(mockEntity, "role_admin");
+      const hasScope = aclService.hasScope(mockEntity, "read:all");
+      expect(hasScope).toBe(true);
+    });
+
+    test("should return false for non-existent scope", async () => {
+      await aclService.assignRoleToUser(mockEntity, "role_admin");
+      const hasScope = aclService.hasScope(mockEntity, "non:existent");
+      expect(hasScope).toBe(false);
+    });
+
+    test("should return false for partial scope match", async () => {
+      await aclService.assignRoleToUser(mockEntity, "role_admin");
+      const hasScope = aclService.hasScope(mockEntity, "read");
+      expect(hasScope).toBe(false);
+    });
+
+    test("should throw error when user has non-existent role", async () => {
+      await aclService.assignRoleToUser(mockEntity, "non-existent-role");
+      expect(() => {
+        aclService.hasScope(mockEntity, "read:all");
+      }).toThrow("Role non-existent-role not found");
+    });
+  });
+
+  describe("hasScopes", () => {
+    test("should return true when user has all scopes", async () => {
+      await aclService.assignRoleToUser(mockEntity, "role_admin");
+      const hasScopes = aclService.hasScopes(mockEntity, ["read:all", "write:all"]);
+      expect(hasScopes).toBe(true);
+    });
+
+    test("should return false when user is missing any scope", async () => {
+      await aclService.assignRoleToUser(mockEntity, "role_user");
+      const hasScopes = aclService.hasScopes(mockEntity, ["read:own", "delete:all"]);
+      expect(hasScopes).toBe(false);
+    });
+
+    test("should return false when user has no roles", () => {
+      const hasScopes = aclService.hasScopes(mockEntity, ["read:all"]);
+      expect(hasScopes).toBe(false);
+    });
+
+    test("should return true for empty scopes array", () => {
+      const hasScopes = aclService.hasScopes(mockEntity, []);
+      expect(hasScopes).toBe(true);
+    });
+
+    test("should return true when user has multiple roles covering all scopes", async () => {
+      await aclService.assignRoleToUser(mockEntity, ["role_admin", "role_user"]);
+      const hasScopes = aclService.hasScopes(mockEntity, ["read:all", "write:own"]);
+      expect(hasScopes).toBe(true);
+    });
+  });
+
+  describe("hasGroup", () => {
+    test("should return true when user has the group", async () => {
+      await aclService.assignGroupToUser(mockEntity, "admin");
+      const hasGroup = aclService.hasGroup(mockEntity, "admin");
+      expect(hasGroup).toBe(true);
+    });
+
+    test("should return false when user does not have the group", async () => {
+      await aclService.assignGroupToUser(mockEntity, "user");
+      const hasGroup = aclService.hasGroup(mockEntity, "admin");
+      expect(hasGroup).toBe(false);
+    });
+
+    test("should return false when user has no groups", () => {
+      const hasGroup = aclService.hasGroup(mockEntity, "admin");
+      expect(hasGroup).toBe(false);
+    });
+
+    test("should return true when user has all specified groups", async () => {
+      await aclService.assignGroupToUser(mockEntity, ["admin", "user"]);
+      const hasGroup = aclService.hasGroup(mockEntity, ["admin", "user"]);
+      expect(hasGroup).toBe(true);
+    });
+
+    test("should return false when user is missing any of the specified groups", async () => {
+      await aclService.assignGroupToUser(mockEntity, ["admin"]);
+      const hasGroup = aclService.hasGroup(mockEntity, ["admin", "user"]);
+      expect(hasGroup).toBe(false);
+    });
+
+    test("should return true for empty groups array", () => {
+      const hasGroup = aclService.hasGroup(mockEntity, []);
+      expect(hasGroup).toBe(true);
+    });
+
+    test("should handle single string group parameter", async () => {
+      await aclService.assignGroupToUser(mockEntity, "admin");
+      const hasGroup = aclService.hasGroup(mockEntity, "admin");
+      expect(hasGroup).toBe(true);
+    });
+
+    test("should handle array of groups parameter", async () => {
+      await aclService.assignGroupToUser(mockEntity, ["admin", "user"]);
+      const hasGroup = aclService.hasGroup(mockEntity, ["admin", "user"]);
+      expect(hasGroup).toBe(true);
+    });
+  });
+
   describe("Edge Cases and Error Handling", () => {
     test("should handle empty roles array in getRoleScopes", () => {
       const scopes = aclService.getRoleScopes([]);

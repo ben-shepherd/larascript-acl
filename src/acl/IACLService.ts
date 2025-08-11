@@ -27,23 +27,34 @@ export interface IBasicACLService {
   getGroup(group: string | IAclGroup): IAclGroup;
   getGroupRoles(group: string | IAclGroup): IAclRole[];
   getGroupScopes(group: string | IAclGroup): string[];
-  getRoleScopesFromUser(data: IAccessControlEntity): string[];
+  getRoleScopesFromUser(entity: IAccessControlEntity): string[];
   getRoleScopes(role: string | string[]): string[];
   getRole(role: string): IAclRole;
+  hasScope(entity: IAccessControlEntity, scope: string): boolean;
+  hasScopes(entity: IAccessControlEntity, scopes: string[]): boolean;
+  hasGroup(entity: IAccessControlEntity, groups: string | string[]): boolean;
   assignRoleToUser(
-    data: IAccessControlEntity,
+    entity: IAccessControlEntity,
     role: string | string[],
   ): Promise<void>;
+  appendRoleToUser(
+    entity: IAccessControlEntity,
+    role: string,
+  ): Promise<void>;
   assignGroupToUser(
-    data: IAccessControlEntity,
+    entity: IAccessControlEntity,
     group: string | string[],
+  ): Promise<void>;
+  appendGroupToUser(
+    entity: IAccessControlEntity,
+    group: string,
   ): Promise<void>;
   removeRoleFromUser(
     usdataer: IAccessControlEntity,
     role: string | string[],
   ): Promise<void>;
   removeGroupFromUser(
-    data: IAccessControlEntity,
+    entity: IAccessControlEntity,
     group: string | string[],
   ): Promise<void>;
 }
