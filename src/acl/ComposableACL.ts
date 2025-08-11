@@ -1,10 +1,6 @@
 import { TClassConstructor } from "../utils/compose";
 import { BasicACLService } from "./BasicACLService";
-import {
-  IAccessControlEntity,
-  IAclConfig,
-  IAclGroup,
-} from "./IACLService";
+import { IAccessControlEntity, IAclConfig, IAclGroup } from "./IACLService";
 
 /**
  * Composable ACL Mixin
