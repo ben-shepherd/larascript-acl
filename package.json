@@ -1,5 +1,5 @@
 {
-  "name": "@ben-shepherd/laracript-acl",
+  "name": "@ben-shepherd/larascript-acl",
   "version": "1.0.4",
   "description": "Access Control List (ACL) module for the Larascript Framework.",
   "repository": {

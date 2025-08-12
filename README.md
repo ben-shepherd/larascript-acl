@@ -35,7 +35,7 @@ A lightweight Access Control List (ACL) service for the Larascript Framework tha
 ## Installation
 
 ```bash
-npm install ben-shepherd/laracript-acl
+npm install ben-shepherd/larascript-acl
 ```
 
 ## Quick Start
