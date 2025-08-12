@@ -35,7 +35,7 @@ A lightweight Access Control List (ACL) service for the Larascript Framework tha
 ## Installation
 
 ```bash
-npm install ben-shepherd/larascript-acl-bundle
+npm install ben-shepherd/laracript-acl
 ```
 
 ## Quick Start
@@ -43,7 +43,7 @@ npm install ben-shepherd/larascript-acl-bundle
 ### Service-based Approach
 
 ```typescript
-import { BasicACLService, IAclConfig, BasicACLException } from '@ben-shepherd/larascript-acl-bundle';
+import { BasicACLService, IAclConfig, BasicACLException } from '@ben-shepherd/larascript-acl';
 
 // Define your ACL configuration
 const aclConfig: IAclConfig = {
@@ -110,8 +110,8 @@ const scopes = aclService.getRoleScopesFromUser(user);
 For a more object-oriented approach, you can use the Composable ACL mixin to add ACL functionality directly to your classes:
 
 ```typescript
-import { compose } from '@ben-shepherd/larascript-acl-bundle/utils';
-import { ComposableACL, IAclConfig } from '@ben-shepherd/larascript-acl-bundle';
+import { compose } from '@ben-shepherd/larascript-acl/utils';
+import { ComposableACL, IAclConfig } from '@ben-shepherd/larascript-acl';
 
 // Define your ACL configuration
 const aclConfig: IAclConfig = {
@@ -231,7 +231,7 @@ interface IAclRole {
 The service uses `BasicACLException` for all error scenarios:
 
 ```typescript
-import { BasicACLException } from '@ben-shepherd/larascript-acl-bundle';
+import { BasicACLException } from '@ben-shepherd/larascript-acl';
 
 try {
   const role = aclService.getRole('non-existent-role');

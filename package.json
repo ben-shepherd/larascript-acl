@@ -1,10 +1,10 @@
 {
-  "name": "@ben-shepherd/larascript-acl-bundle",
+  "name": "@ben-shepherd/laracript-acl",
   "version": "1.0.4",
-  "description": "ACL bundle for Larascript Framework",
+  "description": "Access Control List (ACL) module for the Larascript Framework.",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/ben-shepherd/larascript-acl-bundle"
+    "url": "git+https://github.com/ben-shepherd/larascript-acl"
   },
   "license": "ISC",
   "author": "ben.shepherd@gmx.com",
